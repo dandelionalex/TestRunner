@@ -5,12 +5,12 @@ using Zenject;
 
 /// <summary>
 /// This class responsible for player run speed ( it affect all game items movement)
-/// and it has a stuck with collectable items whih have effect on player. Another collectable items will be managed by another logic class
+/// and it has a collection with collectable items whih have effect only on player. Another collectable items will be managed by another logic class
 /// </summary>
 public class PlayerUnitModel : IInitializable, IDisposable, ISpeedManager, IPlayerVerticalState
 {
-    private const float defaultSpeed = 2f;
-    private const float minSpeed = 1f;
+    private const float defaultSpeed = 2f; //TODO: move to config
+    private const float minSpeed = 1f; //TODO: move to config
 
     public VerticalStateEnum VerticalState {get; private set;}
     public float Speed {get; private set;}
@@ -36,15 +36,17 @@ public class PlayerUnitModel : IInitializable, IDisposable, ISpeedManager, IPlay
 
     private void OnItemCollected(ItemCollectedSignal signal)
     {
-        activeEffects.Add(new AutoDisableEffect(OnEffectDisable, signal.ItemCollected));
+        var item = signal.ItemCollected;
+        activeEffects.Add(new AutoDisableEffect(OnEffectDisable, item, item.CollectableConfiguration.duration));
 
-        switch (signal.ItemCollected)
+        var configuration = item.CollectableConfiguration;
+
+        switch (configuration.type)
         {
             case CollectablesEnum.SpeedUp:
-                Speed += 1.5f;
-                break;
             case CollectablesEnum.SlowDown:
-                Speed = Mathf.Max (minSpeed, Speed -= 1); // TODO: move it to collectables config
+                var config = configuration as SpeedCollectableModifeer;
+                Speed = Mathf.Max (minSpeed, Speed += config.speedModifier);
                 break;
             case CollectablesEnum.Flight:
                 VerticalState = VerticalStateEnum.Up;
@@ -52,22 +54,23 @@ public class PlayerUnitModel : IInitializable, IDisposable, ISpeedManager, IPlay
         }
     }
 
-    private void OnEffectDisable(AutoDisableEffect collectablesEnum)
+    private void OnEffectDisable(AutoDisableEffect autoDisableEffect)
     {
-        activeEffects.Remove(collectablesEnum);
-        switch (collectablesEnum.CollectablesEnum)
+        activeEffects.Remove(autoDisableEffect);
+        var configuration = autoDisableEffect.CollectableItem.CollectableConfiguration;
+        
+        switch (autoDisableEffect.CollectableItem.CollectableConfiguration.type)
         {
             case CollectablesEnum.SpeedUp:
-                Speed = Mathf.Max (minSpeed, Speed -= 1.5f); // TODO: move it to collectables config
-                break;
             case CollectablesEnum.SlowDown:
-                Speed += 1;
+                var speedConfig = configuration as SpeedCollectableModifeer;
+                Speed = Mathf.Max (minSpeed, Speed -= speedConfig.speedModifier);
                 break;
             case CollectablesEnum.Flight:
                 //in case we have two or more flight effects
                 foreach(var effect in activeEffects)
                 {
-                    if(effect.CollectablesEnum == CollectablesEnum.Flight)
+                    if(effect.CollectableItem.CollectableConfiguration.type == CollectablesEnum.Flight)
                     {
                         return;
                     }

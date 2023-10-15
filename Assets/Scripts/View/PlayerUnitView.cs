@@ -39,7 +39,7 @@ public class PlayerUnitView : MonoBehaviour
 
         collectableItem.MarkToDestroy = true;
         
-        signalBus.Fire<ItemCollectedSignal>(new ItemCollectedSignal(collectableItem.Type));
+        signalBus.Fire<ItemCollectedSignal>(new ItemCollectedSignal(collectableItem));
     }
 
     private void Start()

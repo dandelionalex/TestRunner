@@ -388,11 +388,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5261cd18bf76042f39f00feefa2b862d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  elementPrefabs:
-  - {fileID: -5319689156456719511, guid: 3d564f37c080e46ebbf6956f3e704dcf, type: 3}
-  - {fileID: 7789439070997956263, guid: 5e5a22bff7ff04937beefc92f144badf, type: 3}
-  - {fileID: -8591178359975633011, guid: 43bbf6cd3446846fd9e11a1196c982dd, type: 3}
   verticalPosition: -2.5
+  collectableItemPrefab: {fileID: -8591178359975633011, guid: 035c4d0cc67ac437e96e7c4ea1c7b09a, type: 3}
 --- !u!1 &838750866
 GameObject:
   m_ObjectHideFlags: 0

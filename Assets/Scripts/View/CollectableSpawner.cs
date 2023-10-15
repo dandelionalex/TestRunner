@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Zenject;
 
@@ -8,21 +9,29 @@ using Zenject;
 public class CollectableSpawner : MonoBehaviour
 {
     [SerializeField]
-    private CollectableItem[] elementPrefabs;
+    private float verticalPosition;
 
     [SerializeField]
-    private float verticalPosition;
+    private CollectableItem collectableItemPrefab;
 
     private ISpeedManager speedManager;
     private GameCameraView gameCameraView;
 
     private List<CollectableItem> spawnedElements = new List<CollectableItem>();
 
+    private List<CollectableBaseConfiguration> collectables = new List<CollectableBaseConfiguration>();
+    private List<CollectableItem> elementsToDestroy = new List<CollectableItem>();
+
     [Inject]
     private void Init(ISpeedManager speedManager, GameCameraView gameCameraView)
     {
         this.speedManager = speedManager;
         this.gameCameraView = gameCameraView;
+    }
+
+    private void OnEnable()
+    {
+        collectables = Resources.LoadAll<CollectableBaseConfiguration>("Collectables").ToList();
     }
 
     private void Start()
@@ -37,14 +46,14 @@ public class CollectableSpawner : MonoBehaviour
 
     private void SpawnElement()
     {
-        var randomIndex = Random.Range(0, elementPrefabs.Length);
-        var element = Instantiate(elementPrefabs[randomIndex], transform);
+        var randomIndex = Random.Range(0, collectables.Count);
+        
+        var element = Instantiate(collectableItemPrefab, transform);
+        element.Init(collectables[randomIndex]);
         element.transform.position = new Vector3(gameCameraView.GameViewSize.x/2, verticalPosition, 0);
 
         spawnedElements.Add(element);
     }
-
-    private List<CollectableItem> elementsToDestroy = new List<CollectableItem>();
 
     private void MoveAllElements()
     {

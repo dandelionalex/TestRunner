@@ -4,18 +4,19 @@ using System.Threading.Tasks;
 public class AutoDisableEffect
 {
     private Action<AutoDisableEffect> onDisable;
-    public CollectablesEnum CollectablesEnum {get; private set;}
+    public CollectableItem CollectableItem {get; private set;}
 
-    public AutoDisableEffect(Action<AutoDisableEffect> onDisable, CollectablesEnum collectablesEnum)
+    public AutoDisableEffect(Action<AutoDisableEffect> onDisable, CollectableItem collectablesEnum, int duration)
     {
         this.onDisable = onDisable;
-        this.CollectablesEnum = collectablesEnum;
-        DisableTimr();
+        this.CollectableItem = collectablesEnum;
+        
+        DisableTimr(duration);
     }
 
-    private async Task DisableTimr()
+    private async Task DisableTimr(int duration)
     {
-        await Task.Delay(10000);
+        await Task.Delay(duration);
         onDisable?.Invoke(this);
     }
 }

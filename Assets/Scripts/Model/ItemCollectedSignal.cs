@@ -1,8 +1,8 @@
 public class ItemCollectedSignal 
 {
-    public CollectablesEnum ItemCollected { get; private set; }
+    public CollectableItem ItemCollected { get; private set; }
 
-    public ItemCollectedSignal(CollectablesEnum itemCollected)
+    public ItemCollectedSignal(CollectableItem itemCollected)
     {
         this.ItemCollected = itemCollected;
     }
